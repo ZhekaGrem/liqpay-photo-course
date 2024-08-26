@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
     currency: "UAH",
     description: description,
     order_id: order_id,
-    server_url: "http://yourdomain.com/callback", // URL для отримання callback від LiqPay
+    server_url: "https://www.screenphotoschool.com.ua/callback", // URL для отримання callback від LiqPay
   };
 
   const data = Buffer.from(JSON.stringify(params)).toString("base64");
@@ -46,23 +46,27 @@ app.get("/", (req, res) => {
 });
 
 // Ендпоінт для обробки callback від LiqPay
-app.post("/callback", (req, res) => {
-  const data = req.body.data;
-  const receivedSignature = req.body.signature;
+app.post("/pay", (req, res) => {
+  const { amount, description, order_id } = req.body;
 
-  // Перевірка підпису для підтвердження цілісності даних
-  const expectedSignature = crypto
+  const params = {
+    public_key: publicKey,
+    version: "3",
+    action: "pay",
+    amount: amount.toString(),
+    currency: "UAH",
+    description: description,
+    order_id: order_id,
+    server_url: "https://www.screenphotoschool.com.ua/callback",
+  };
+
+  const data = Buffer.from(JSON.stringify(params)).toString("base64");
+  const signature = crypto
     .createHash("sha1")
     .update(privateKey + data + privateKey)
     .digest("base64");
 
-  if (receivedSignature === expectedSignature) {
-    const parsedData = JSON.parse(Buffer.from(data, "base64").toString("utf8"));
-    console.log("Callback data: ", parsedData);
-    res.status(200).send("OK");
-  } else {
-    res.status(400).send("Invalid signature");
-  }
+  res.json({ data, signature });
 });
 
 // Запуск сервера
