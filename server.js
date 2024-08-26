@@ -12,6 +12,8 @@ app.use(bodyParser.json());
 
 const publicKey = process.env.PUBLIC_KEY;
 const privateKey = process.env.PRIVATE_KEY;
+const test = process.env.TEST_KEY;
+console.log(test);
 
 app.get("/", (req, res) => {
   const params = {
@@ -65,3 +67,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Сервер запущено на порту ${PORT}`);
 });
+console.log("Params:", params);
+console.log("Data:", data);
+console.log("Signature:", signature);
