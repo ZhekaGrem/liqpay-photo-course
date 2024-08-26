@@ -1,6 +1,10 @@
 const express = require("express");
 const crypto = require("crypto");
+const cors = require("cors");
 const bodyParser = require("body-parser");
+
+app.use(cors());
+
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
