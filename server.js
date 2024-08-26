@@ -2,6 +2,7 @@ const express = require("express");
 const crypto = require("crypto");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+require("dotenv").config();
 
 
 
@@ -9,10 +10,10 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
+const dotenv = require("dotenv");
 const publicKey = process.env.PUBLIC_KEY;
 const privateKey = process.env.PRIVATE_KEY;
-const test = process.env.TEST_KEY;
+const testKey = process.env.TEST_KEY;
 
 
 app.get("/", (req, res) => {
@@ -68,4 +69,5 @@ app.listen(PORT, () => {
   console.log(`Сервер запущено на порту ${PORT}`);
 });
 
-console.log(test);
+console.log("test");
+console.log(testKey);
