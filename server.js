@@ -122,13 +122,14 @@ app.post("/callback", async (req, res) => {
   console.log("Payment data:", decodedData);
 
   if (decodedData.status === "success") {
-    // Відправлення підтвердження оплати в Telegram
+    console.log("Preparing to send Telegram message");
     const text = `Підтверджено оплату на суму ${decodedData.amount} UAH для замовлення ${decodedData.order_id}.`;
-    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(
       text
     )}`;
 
     try {
+      console.log("Sending request to Telegram API");
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -136,13 +137,15 @@ app.post("/callback", async (req, res) => {
       const data = await response.json();
 
       if (!data.ok) {
-        console.error("Помилка при відправці в Telegram");
+        console.error("Error sending to Telegram:", data);
       } else {
-        console.log("Повідомлення надіслано в Telegram");
+        console.log("Message sent to Telegram successfully");
       }
     } catch (error) {
-      console.error("Помилка:", error);
+      console.error("Error:", error);
     }
+  } else {
+    console.log("Payment status is not success:", decodedData.status);
   }
 
   res.status(200).send("OK");
@@ -152,3 +155,4 @@ app.post("/callback", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Сервер запущено на порту ${PORT}`);
 });
+
