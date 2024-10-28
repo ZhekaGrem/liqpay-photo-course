@@ -40,7 +40,7 @@ app.get("/", (req, res) => {
     currency: "UAH",
     description: "Test payment",
     order_id: `order_${Date.now()}`, // Унікальний order_id
-    server_url: "https://www.screenphotoschool.com.ua/callback",
+    // server_url: "https://www.screenphotoschool.com.ua/callback",
   };
 
   const { data, signature } = generateLiqPayParams(params);
@@ -69,7 +69,7 @@ app.post("/pay", (req, res) => {
     currency: "UAH",
     description,
     order_id,
-    server_url: "https://www.screenphotoschool.com.ua/callback",
+    server_url: "https://www.screenphotoschool.com.ua/",
   };
 
   const { data, signature } = generateLiqPayParams(params);
