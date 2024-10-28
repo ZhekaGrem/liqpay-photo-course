@@ -1,6 +1,10 @@
 const express = require("express");
 const crypto = require("crypto");
 const cors = require("cors");
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
+const morgan = require("morgan");
+
 require("dotenv").config();
 
 const {
@@ -23,13 +27,24 @@ if (
 }
 const app = express();
 
+app.use(helmet());
+app.use(morgan('combined')); // Logging
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 100, 
+});
+app.use(limiter);
+
 const corsOptions = {
   origin: CORS_ORIGIN,
   optionsSuccessStatus: 200,
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(express.json());
 
 function generateLiqPayParams(params) {
