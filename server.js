@@ -3,13 +3,25 @@ const crypto = require("crypto");
 const cors = require("cors");
 require("dotenv").config();
 
-const { CORS_ORIGIN, PUBLIC_KEY, PRIVATE_KEY, PORT = 3001 } = process.env;
-if (!CORS_ORIGIN || !PUBLIC_KEY || !PRIVATE_KEY) {
+const {
+  CORS_ORIGIN,
+  PUBLIC_KEY,
+  PRIVATE_KEY,
+  TELEGRAM_BOT_TOKEN,
+  TELEGRAM_CHAT_ID,
+  PORT = 3001,
+} = process.env;
+if (
+  !CORS_ORIGIN ||
+  !PUBLIC_KEY ||
+  !PRIVATE_KEY ||
+  !TELEGRAM_BOT_TOKEN ||
+  !TELEGRAM_CHAT_ID
+) {
   console.error("Missing required environment variables.");
   process.exit(1);
 }
 const app = express();
-
 
 
 const corsOptions = {
@@ -77,7 +89,7 @@ app.post("/pay", (req, res) => {
   res.json({ data, signature });
 });
 
-app.post("/callback", (req, res) => {
+app.post("/callback", async (req, res) => {
   const { data, signature } = req.body;
 
   // Перевірка підпису
@@ -95,7 +107,29 @@ app.post("/callback", (req, res) => {
   // Обробка даних платежу
   console.log("Payment data:", decodedData);
 
-  // Тут ви можете додати логіку обробки успішного платежу
+  if (decodedData.status === "success") {
+    // Відправлення підтвердження оплати в Telegram
+    const text = `Підтверджено оплату на суму ${decodedData.amount} UAH для замовлення ${decodedData.order_id}.`;
+    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(
+      text
+    )}`;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+      });
+      const data = await response.json();
+
+      if (!data.ok) {
+        console.error("Помилка при відправці в Telegram");
+      } else {
+        console.log("Повідомлення надіслано в Telegram");
+      }
+    } catch (error) {
+      console.error("Помилка:", error);
+    }
+  }
 
   res.status(200).send("OK");
 });
